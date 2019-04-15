@@ -1,11 +1,13 @@
 package persistent
 
 import (
+	"apipay/config"
 	"apipay/model"
 	"context"
 	"reflect"
 	"testing"
 
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,7 +18,17 @@ const (
 
 func createTestDB(ctx context.Context, dbName string) (Client, error) {
 
-	client, err := Connect(ctx, mongoHost, mongoPort, "", "")
+	err := config.Load()
+	if err != nil {
+		return Client{}, err
+	}
+
+	client, err := Connect(ctx,
+		viper.GetString(config.MongoHost),
+		viper.GetInt(config.MongoPort),
+		viper.GetString(config.MongoUser),
+		viper.GetString(config.MongoPassword))
+
 	if err != nil {
 		return Client{}, err
 	}

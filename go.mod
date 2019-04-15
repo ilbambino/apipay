@@ -20,6 +20,6 @@ require (
 	go.uber.org/multierr v1.1.0 // indirect
 	go.uber.org/zap v1.9.1
 	golang.org/x/sync v0.0.0-20190227155943-e225da77a7e6 // indirect
-	golang.org/x/tools v0.0.0-20190411180116-681f9ce8ac52 // indirect
+	golang.org/x/tools v0.0.0-20190415154727-2b5498619ef1 // indirect
 	gopkg.in/go-playground/validator.v8 v8.18.2 // indirect
 )

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"apipay/config"
 	"apipay/model"
 	"apipay/persistent"
 	"bytes"
@@ -11,19 +12,28 @@ import (
 	"testing"
 	"time"
 
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
 )
 
 const (
-	mongoHost   = "localhost"
-	mongoPort   = 27017
 	testTimeOut = time.Second * 10
 )
 
 func createSupportItems(ctx context.Context, dbName string) (persistent.Payments, *zap.Logger, error) {
 
-	client, err := persistent.Connect(ctx, mongoHost, mongoPort, "", "")
+	err := config.Load()
+	if err != nil {
+		return persistent.Payments{}, nil, err
+	}
+
+	client, err := persistent.Connect(ctx,
+		viper.GetString(config.MongoHost),
+		viper.GetInt(config.MongoPort),
+		viper.GetString(config.MongoUser),
+		viper.GetString(config.MongoPassword))
+
 	if err != nil {
 		return persistent.Payments{}, nil, err
 	}
