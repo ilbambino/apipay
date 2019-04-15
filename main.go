@@ -61,7 +61,7 @@ func main() {
 	logger.Sugar().Infow("server-init", "gitHash", gitHash)
 
 	db, err := persistent.Connect(ctx,
-		viper.GetString(config.MongoServer),
+		viper.GetString(config.MongoHost),
 		viper.GetInt(config.MongoPort),
 		viper.GetString(config.MongoUser),
 		viper.GetString(config.MongoPassword))

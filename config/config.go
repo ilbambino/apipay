@@ -10,8 +10,8 @@ package config
 import "github.com/spf13/viper"
 
 const (
-	// MongoServer holds the mongo server name
-	MongoServer = "MongoServer"
+	// MongoHost holds the mongo server name
+	MongoHost = "MongoHost"
 
 	// MongoPort holds the mongo server name
 	MongoPort = "MongoPort"
@@ -30,8 +30,8 @@ func Load() error {
 
 	viper.SetEnvPrefix("APIPAY")
 
-	viper.SetDefault(MongoServer, "localhost")
-	err := viper.BindEnv(MongoServer)
+	viper.SetDefault(MongoHost, "localhost")
+	err := viper.BindEnv(MongoHost)
 	if err != nil {
 		return err
 	}
