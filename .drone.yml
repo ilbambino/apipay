@@ -1,0 +1,21 @@
+kind: pipeline
+name: default
+
+steps:
+- name: build
+  image: golang:1.12
+  environment:
+    APIPAY_MONGOHOST: mongo
+  commands:
+  - make
+
+- name: testing
+  image: golang:1.12
+  environment:
+    APIPAY_MONGOHOST: mongo
+  commands:
+  - make test
+
+services:
+- name: mongo
+  image: mongo:3.6
