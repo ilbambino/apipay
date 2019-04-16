@@ -45,14 +45,14 @@ Once you have the _json_ you can use [swagger2pdf](https://www.npmjs.com/package
 
 This project it is just a starting point, and it could have lots of improvements. Not done because the lack of time.
 
-- *Improve the documentation generation*. So it is really useful and looks decent. Also automating the generation of it in the `Makefile``
-- *Improve Logging* Add a request ID when a request is done to be able to trace requests. `Gin` also should use the same logger (and json formatting).
-- *Tracing* With [Jaeger](https://www.jaegertracing.io/) it should be easy to do.
-- *Health* It would be nice if the service would expose some health APIs so external parties can know if the service is working properly, eg. `/health/status` API.
-- *TLS* Depending on how this would be deployed, it might need to do the TLS termination.
-- *Authentication* Currently the API does not perform any Auth on the request.
-- *Data Model improvements* There should be proper validation on the models. Also when serializing to Mongo and _json_ `omitempty` could be added if needed.
-- *Pagination* The get list of payments is hardcoded to a max 100 elements. Pagination could be implemented.
-- *Tests* Some basic tests have been added. But there should be more, testing the errors, etc.
-- *CI* Project currently uses CI, but the binary generated is not saved anywhere. And easy one would be to build a Docker image and push it to Docker Hub. But it depends on how this would be run in practice.
-- *Git* Instead of using _master_ use proper PRs and reviews.
+- **Improve the documentation generation**. So it is really useful and looks decent. Also automating the generation of it in the `Makefile`
+- **Improve Logging**. Add a request ID when a request is done to be able to trace requests. `Gin` also should use the same logger (and json formatting).
+- **Tracing** With [Jaeger](https://www.jaegertracing.io/) it should be easy to do.
+- **Health** It would be nice if the service would expose some health APIs so external parties can know if the service is working properly, eg. `/health/status` API.
+- **TLS** Depending on how this would be deployed, it might need to do the TLS termination.
+- **Authentication** Currently the API does not perform any Auth on the request.
+- **Data Model improvements** There should be proper validation on the models. Also when serializing to Mongo and _json_ `omitempty` could be added if needed.
+- **Pagination** The get list of payments is hardcoded to a max 100 elements. Pagination could be implemented.
+- **Tests** Some basic tests have been added. But there should be more, testing the errors, etc.
+- **CI** Project currently uses CI, but the binary generated is not saved anywhere. And easy one would be to build a Docker image and push it to Docker Hub. But it depends on how this would be run in practice.
+- **Git** Instead of using _master_ use proper PRs and reviews.
