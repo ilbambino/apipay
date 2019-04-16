@@ -89,6 +89,9 @@ func TestSave(t *testing.T) {
 	assert.NoError(t, err, "We can fetch list from DB")
 	assert.Equal(t, 1, len(payments), "We got what we inserted")
 
+	err = paymentsDB.Save(ctx, payment1)
+	assert.Error(t, err, "We cannot save twice")
+
 }
 
 func TestInsertDelete(t *testing.T) {
@@ -169,12 +172,30 @@ func TestInsertUpdate(t *testing.T) {
 	assert.Equal(t, 1, len(payments), "We got what we inserted")
 
 	payment1.OrganisationID = "newOrg"
-	err = paymentsDB.Save(ctx, payment1)
+	err = paymentsDB.Update(ctx, payment1)
 	assert.NoError(t, err, "We can update from DB")
 
 	dbItem, err := paymentsDB.Get(ctx, payment1.ID)
 	assert.NoError(t, err, "We can get items from DB")
 	assert.True(t, reflect.DeepEqual(payment1, dbItem), "We loaded from DB what we saved")
+
+}
+
+func TestUpdateError(t *testing.T) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), defaultDBTimeout)
+	defer cancel()
+
+	client, err := createTestDB(ctx, "updateErrorDB")
+	assert.NoError(t, err, "We can connect to DB")
+
+	paymentsDB, err := GetPayments(ctx, client)
+	assert.NoError(t, err, "We can init DB")
+
+	payment2 := testPayment(model.PaymentID("123456"))
+
+	err = paymentsDB.Update(ctx, payment2)
+	assert.Error(t, err, "We cannot update")
 
 }
 func TestList100(t *testing.T) {

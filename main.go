@@ -43,6 +43,13 @@ func getHandler(logger *zap.Logger, paymentDb persistent.Payments) http.Handler 
 	return router
 }
 
+// @title APIPAY Payments API
+// @version 1.0
+// @description This is an example implementation of an API to serve Payments
+// @description The documentation is automatically built from the code.
+// @description There are many TODOs and things not fully finalized.
+// @description Please read the README file in the same repository.
+
 func main() {
 	ctx := context.Background()
 	err := config.Load()

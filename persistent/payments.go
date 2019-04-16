@@ -3,6 +3,7 @@ package persistent
 import (
 	"apipay/model"
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -61,21 +62,32 @@ func (p *Payments) init(ctx context.Context) error {
 	return nil
 }
 
-// Save saves a payment to DB. If it is already there it will replace it, otherwise
-// it will save it
+// Save saves a payment to DB. If it is already there it will fail
 func (p *Payments) Save(ctx context.Context, obj model.Payment) error {
 
 	ctx, cancel := context.WithTimeout(ctx, defaultDBTimeout)
 	defer cancel()
 
-	filter := bson.D{{"id", obj.ID}}
-	ops := options.Replace()
-	ops.SetUpsert(true)
-	_, err := p.collection.ReplaceOne(ctx, filter, obj, ops)
+	_, err := p.collection.InsertOne(ctx, obj)
+	return err
+}
+
+// Update updates a payment to DB. If it is already there it will replace it, otherwise
+// it will create it
+func (p *Payments) Update(ctx context.Context, obj model.Payment) error {
+
+	ctx, cancel := context.WithTimeout(ctx, defaultDBTimeout)
+	defer cancel()
+
+	_, err := p.Get(ctx, obj.ID) //TODO investigate why it cannot be done in one go
 	if err != nil {
 		return err
 	}
-	return nil
+	filter := bson.D{{"id", obj.ID}}
+
+	res := p.collection.FindOneAndReplace(ctx, filter, obj)
+	fmt.Println(res, res.Err())
+	return res.Err()
 }
 
 // Get tries to find a payment in the DB and returns it

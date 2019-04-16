@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 	"time"
 
@@ -137,14 +138,12 @@ func TestInsertUpdateGetAll(t *testing.T) {
 
 	payment1 := testPayment(model.PaymentID("12345"))
 
-	// get a payment (no payment available)
-	w := httptest.NewRecorder()
-
 	// create a new payment
 	payment1Json, err := json.Marshal(payment1)
 	assert.NoError(t, err, "We can marshal to json")
 	req, err := http.NewRequest("POST", "/payments/", bytes.NewBuffer(payment1Json))
 	assert.NoError(t, err, "We can can the http request")
+	w := httptest.NewRecorder()
 	router.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusCreated, w.Code)
 
@@ -159,4 +158,68 @@ func TestInsertUpdateGetAll(t *testing.T) {
 	err = json.Unmarshal(w.Body.Bytes(), &obj)
 	assert.NoError(t, err, "We can unmarshal the json")
 
+	//update the payment
+	payment1.OrganisationID = "updatedOrg"
+	payment1Json, err = json.Marshal(payment1)
+	assert.NoError(t, err, "We can marshal to json")
+
+	req, err = http.NewRequest("PUT", "/payments/"+string(payment1.ID), bytes.NewBuffer(payment1Json))
+	assert.NoError(t, err, "We can can the http request")
+	w = httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	// get payment again, it got updated
+	req, err = http.NewRequest("GET", "/payments/"+string(payment1.ID), nil)
+	w = httptest.NewRecorder()
+	assert.NoError(t, err, "We can can the http request")
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	obj = model.Payment{}
+	err = json.Unmarshal(w.Body.Bytes(), &obj)
+	assert.NoError(t, err, "We can unmarshal the json")
+	assert.True(t, reflect.DeepEqual(payment1, obj), "We got what we saved")
+
+}
+
+func TestUpdateInvalid(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), testTimeOut)
+	defer cancel()
+
+	db, logger, err := createSupportItems(ctx, "api_updateinvalid")
+	assert.NoError(t, err, "We can init the needed deps")
+
+	router := getHandler(logger, db)
+
+	payment1 := testPayment(model.PaymentID("12345"))
+
+	// create a new payment
+	payment1Json, err := json.Marshal(payment1)
+	assert.NoError(t, err, "We can marshal to json")
+
+	//not matching IDs
+	req, err := http.NewRequest("PUT", "/payments/blabla", bytes.NewBuffer(payment1Json))
+	assert.NoError(t, err, "We can can the http request")
+	w := httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+
+	// not found
+	req, err = http.NewRequest("PUT", "/payments/"+string(payment1.ID), bytes.NewBuffer(payment1Json))
+	assert.NoError(t, err, "We can can the http request")
+	w = httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusNotFound, w.Code)
+
+	// invalid payment
+	payment1.OrganisationID = ""
+	payment1Json, err = json.Marshal(payment1)
+	assert.NoError(t, err, "We can marshal to json")
+
+	req, err = http.NewRequest("PUT", "/payments/"+string(payment1.ID), bytes.NewBuffer(payment1Json))
+	assert.NoError(t, err, "We can can the http request")
+	w = httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusBadRequest, w.Code)
 }
